@@ -1,17 +1,27 @@
 package com.poissonerie.cherifla.domain.model;
 
-public record Product(String name, String description, double pricePerKg, Boolean available) {
+public record Product(Long id, String name, String description, double pricePerKg, Boolean available) {
     public Product(ProductBuilder builder) {
-        this(builder.name, builder.description, builder.pricePerKg, builder.available);
+        this(builder.id, builder.name, builder.description, builder.pricePerKg, builder.available);
+    }
+
+    public Boolean hasCompleteInformation() {
+        return name != null && description != null && pricePerKg > 0 && available != null;
     }
 
     public static final class ProductBuilder {
+        private Long id;
         private String name;
         private String description;
         private double pricePerKg;
         private Boolean available;
 
-        private ProductBuilder() {
+        public ProductBuilder() {
+        }
+
+        public ProductBuilder withId(Long id) {
+            this.id = id;
+            return this;
         }
 
         public ProductBuilder withName(String name) {
@@ -35,7 +45,7 @@ public record Product(String name, String description, double pricePerKg, Boolea
         }
 
         public Product build() {
-            return new Product(name, description, pricePerKg, available);
+            return new Product(id, name, description, pricePerKg, available);
         }
     }
 }
