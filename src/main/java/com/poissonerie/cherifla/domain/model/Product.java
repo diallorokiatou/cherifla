@@ -1,45 +1,54 @@
 package com.poissonerie.cherifla.domain.model;
 
-public record Product(Long id, String name, String description, double pricePerKg, Boolean available) {
-    public Product(ProductBuilder builder) {
-        this(builder.id, builder.name, builder.description, builder.pricePerKg, builder.available);
+public record Product(Long id, String name, String description, double pricePerKg, boolean available) {
+    public static Builder builder() {
+        return new Builder();
+    }
+    public boolean hasCompleteInformation() {
+        return name != null && description != null && pricePerKg > 0;
     }
 
-    public Boolean hasCompleteInformation() {
-        return name != null && description != null && pricePerKg > 0 && available != null;
+    public static Product from(Product product) {
+        return new Builder()
+                .withId(product.id())
+                .withName(product.name())
+                .withDescription(product.description())
+                .withPricePerKg(product.pricePerKg())
+                .withAvailable(product.available())
+                .build();
     }
 
-    public static final class ProductBuilder {
+    public static final class Builder {
         private Long id;
         private String name;
         private String description;
         private double pricePerKg;
-        private Boolean available;
+        private boolean available;
 
-        public ProductBuilder() {
+        private Builder() {
         }
 
-        public ProductBuilder withId(Long id) {
+        public Builder withId(Long id) {
             this.id = id;
             return this;
         }
 
-        public ProductBuilder withName(String name) {
+        public Builder withName(String name) {
             this.name = name;
             return this;
         }
 
-        public ProductBuilder withDescription(String description) {
+        public Builder withDescription(String description) {
             this.description = description;
             return this;
         }
 
-        public ProductBuilder withPricePerKg(double pricePerKg) {
+        public Builder withPricePerKg(double pricePerKg) {
             this.pricePerKg = pricePerKg;
             return this;
         }
 
-        public ProductBuilder withAvailable(Boolean available) {
+        public Builder withAvailable(boolean available) {
             this.available = available;
             return this;
         }
@@ -48,4 +57,5 @@ public record Product(Long id, String name, String description, double pricePerK
             return new Product(id, name, description, pricePerKg, available);
         }
     }
+
 }

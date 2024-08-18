@@ -13,22 +13,43 @@ import java.util.Objects;
 public class ProductEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private Long id;
 
     @Column(nullable = false)
-    private final String name;
+    private String name;
 
     @Column
-    private final String description;
+    private String description;
 
     @Column(nullable = false)
-    private final double pricePerKg;
+    private double pricePerKg;
 
     @Column(nullable = false)
-    private final Boolean available;
+    private Boolean available;
 
     public ProductEntity from(Product product) {
-        return new ProductEntity(product.id(), product.name(), product.description(), product.pricePerKg(), product.available());
+        return ProductEntity
+                .builder()
+                .withId(product.id())
+                .withName(product.name())
+                .withDescription(product.description())
+                .withPricePerKg(product.pricePerKg())
+                .withAvailable(product.available())
+                .build();
+    }
+
+    public Product to() {
+        return Product
+                .builder()
+                .withId(id)
+                .withName(name)
+                .withDescription(description)
+                .withPricePerKg(pricePerKg)
+                .withAvailable(available)
+                .build();
+    }
+
+    public ProductEntity() {
     }
 
     public ProductEntity(@JsonProperty("id") Long id, @JsonProperty("name") String name, @JsonProperty("description") String description, @JsonProperty("pricePerKg") double pricePerKg, @JsonProperty("available") Boolean available) {
@@ -59,6 +80,8 @@ public class ProductEntity{
         return available;
     }
 
+
+
     @Override
     public String toString() {
         return "ProductEntity{" +
@@ -83,5 +106,48 @@ public class ProductEntity{
         return Objects.hash(id, name, description, pricePerKg, available);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private Long id;
+        private String name;
+        private String description;
+        private double pricePerKg;
+        private Boolean available;
+
+        private Builder() {
+        }
+
+        public Builder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder withPricePerKg(double pricePerKg) {
+            this.pricePerKg = pricePerKg;
+            return this;
+        }
+
+        public Builder withAvailable(Boolean available) {
+            this.available = available;
+            return this;
+        }
+
+        public ProductEntity build() {
+            return new ProductEntity(id, name, description, pricePerKg, available);
+        }
+    }
 
 }

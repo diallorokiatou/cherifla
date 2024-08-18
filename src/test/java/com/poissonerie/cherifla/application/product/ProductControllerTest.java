@@ -1,7 +1,5 @@
 package com.poissonerie.cherifla.application.product;
 
-import com.poissonerie.cherifla.domain.model.Product;
-import com.poissonerie.cherifla.domain.port.ProductRepository;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +20,12 @@ class ProductControllerTest {
     @LocalServerPort
     private Integer port;
 
-    static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer("postgres:13.3");
+    static PostgreSQLContainer<?> postgreSQLContainer;
+
+    static {
+        postgreSQLContainer = new PostgreSQLContainer("postgres:13.3");
+        postgreSQLContainer.withInitScript("scriptSQL/create_product_shema.sql");
+    }
 
     @BeforeAll
     static void beforeAll() {
@@ -42,32 +45,32 @@ class ProductControllerTest {
     }
 
     @Autowired
-    private ProductRepository repository;
+    private ProductRepositoryJpa repository;
+
 
     @BeforeEach
     void setUp() {
-        RestAssured.baseURI = "http://localhost" + port;
+        RestAssured.baseURI = "http://localhost:" + port;
         repository.deleteAll();
+    }
+
+    @Test
+    void should_return_no_product() {
+        // Given
+
+
+        // When
+        RestAssured.get("/products")
+                .then()
+                .statusCode(204);
     }
 
     @Test
     void should_return_all_products() {
         // Given
-        Product fish = new Product.ProductBuilder()
-                .withName("Poisson")
-                .withPricePerKg(10.0)
-                .withAvailable(true)
-                .build();
 
-        Product fruit = new Product.ProductBuilder()
-                .withName("Fruit")
-                .withPricePerKg(5.0)
-                .withAvailable(true)
-                .withDescription("Fruit frais")
-                .build();
-
-        repository.addProduct(fish);
-        repository.addProduct(fruit);
+        repository.save(fishEntityBuilder());
+        repository.save(fruitBuilder());
 
         // When
         RestAssured.get("/products")
@@ -75,5 +78,21 @@ class ProductControllerTest {
                 .statusCode(200)
                 .body("name", hasItems("Poisson", "Fruit"));
 
+    }
+
+    private ProductEntity fishEntityBuilder() {
+        return ProductEntity.builder()
+                .withName("Poisson")
+                .withPricePerKg(10.0)
+                .withAvailable(true)
+                .build();
+    }
+
+    private ProductEntity fruitBuilder() {
+        return ProductEntity.builder()
+                .withName("Fruit")
+                .withPricePerKg(5.0)
+                .withAvailable(true)
+                .build();
     }
 }
